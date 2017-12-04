@@ -1,19 +1,16 @@
 const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+const WIDTH = canvas.width;
+const HEIGHT = canvas.height;
 
 const resetBtn = document.getElementById("reset");
 const happyBtn = document.getElementById("happy");
 const sadBtn = document.getElementById("sad");
 const angryBtn = document.getElementById("angry");
 
-
-const context = canvas.getContext("2d");
-const WIDTH = canvas.width;
-const HEIGHT = canvas.height;
-
 function faceMap(name) {
-    return name.map(r => r[0].split(""))
+    return name.map(f => f[0].split(""))
 }
-
 
 function drawCell(x, y, width, height, c) {
     context.fillStyle = c;
@@ -26,15 +23,18 @@ function gridColour(int) {
     }
     if (int == 0) {
         return "rgb(15,55,105)"
-    }
-    if (int == 2) {
-        return "rgb(255,0,255)"
     } else {
         return "rgb(15,55,105)"
     }
 }
 
-function drawGrid(context, grid) {
+function drawEyes(context) {
+    context.fillStyle = "rgb(15,55,105)"
+    context.fillRect(90, 145, 6, 6);
+    context.fillRect(155, 145, 6, 6);
+}
+
+function drawFace(context, grid) {
     let w = WIDTH / grid.length;
     for (let i = 0; i < grid.length; ++i) {
         let h = HEIGHT / grid[i].length;
@@ -45,16 +45,43 @@ function drawGrid(context, grid) {
     }
 }
 
+function drawPart(context, grid, sx, sy) {
+    for (let i = 0; i < grid.length; ++i) {
+        for (let j = 0; j < grid[i].length; ++j) {
+            drawCell(j*2 + sx, i*2 + sy, 2, 2, gridColour(grid[i][j]));
+        }
+    }
+}
+
+function mouse(evt) {
+    console.log(evt)
+    let boundingRect = canvas.getBoundingClientRect();
+    console.log(boundingRect)
+}
+
 happyBtn.addEventListener("click", function () {
-    drawGrid(context, faceMap(happy));
+    drawFace(context, faceMap(happy));
+    drawEyes(context);
 }, false)
 sadBtn.addEventListener("click", function () {
-    drawGrid(context, faceMap(sad));
+    drawFace(context, faceMap(sad));
+    drawEyes(context);
+
 }, false)
 angryBtn.addEventListener("click", function () {
-    drawGrid(context, faceMap(angry));
+    drawFace(context, faceMap(angry));
+    drawEyes(context);
 }, false)
 resetBtn.addEventListener("click", function () {
-    drawGrid(context, faceMap(neutral));
+    drawFace(context, faceMap(neutral));
+    drawEyes(context);
 }, false)
-drawGrid(context, faceMap(neutral));
+canvas.addEventListener("click", mouse)
+
+canvas.addEventListener("click", function () {
+    drawPart(context, faceMap(tear),160,185)
+}, false)
+
+
+drawFace(context, faceMap(neutral));
+drawEyes(context);
