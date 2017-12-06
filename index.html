@@ -1,20 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css?family=Fira+Mono" rel="stylesheet">
+    <title>Saitama</title>
 </head>
+<style>
+    body {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        grid-template-columns: 1fr auto;
+        max-width: 356px;
+        font-family: 'Fira Mono', monospace;
+        font-size: 14px
+    }
+
+    button {
+        grid-column: 1 / 2;
+        background: #e35b5a;
+        color: #f8fafa;
+        text-decoration: none;
+        border: none;
+        width: 100px;
+    }
+
+    button:hover {
+        background: #e35b5a;
+        text-decoration: none;
+        border: none;
+    }
+    ul{
+        text-align: left;
+    }
+
+    #canvas {
+        border: solid 1px black;
+        grid-column: 2/2;
+    }
+
+    #buttons {
+        background: #997a8e;
+        display: grid;
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+        grid-template-columns: repeat(auto-fit, minmax(15vw, 1fr));
+        width: 100px;
+        max-height: 258px;
+    }
+    #text {
+        grid-column: span 2;
+        text-align: center;
+    }
+</style>
+
 <body>
-    <canvas id="canvas" style="border:solid 1px black" width="256" height="256"></canvas>
-    <button id="kawaii">Kawaii (cute)</button>
-    <button id="sad">Kanashii (sad)</button>
-    <button id="oni">Oni (demon)</button>
-    <button id="reset">Saitama (reset)</button>
+    <canvas id="canvas" width="256" height="256"></canvas>
+    <div id="buttons">
+        <button id="kawaii">Kawaii (cute)</button>
+        <button id="sad">Kanashii (sad)</button>
+        <button id="oni">Oni (demon)</button>
+        <button id="reset">Saitama (reset)</button>
+    </div>
+    <div id="text">
+        <h3>The many faces of Saitama</h3>
+        <p>Firstly, if you get the reference, well done!</p>
+        <p>Saitama is an expressive guy, for all of his lack of hair he can perfrom a surprising range of facial acrobatics.</p>
+        <p>You should know that he is also quite sensetive to interaction, if you touch his face in the following ways, you may discover some interesting reactions:</p>
+        <ul>
+            <li>Poke him once in the right eye to make it water</li>
+            <li>Poke his eye again and he may get upset</li>
+            <li>Stroke his chin and watch a beard suddenly appear, when you're near</li>
+            <li>Stroke his beard to watch it miraculously grow in length and majesty</li>
+            <li>For some extra entertainment, click his forehead (fivehead?) for some excellent shades to help him deal with "it"</li>
+        </ul>
+        <p>A final note, combine any of the effects and see what you get. A teary demon?</p>
+    </div>
     <script src="background.js"></script>
-    <script src="expressions.js"></script>     
-    <script src="parts.js"></script>    
+    <script src="expressions.js"></script>
+    <script src="parts.js"></script>
     <script src="index.js"></script>
 </body>
+
 </html>

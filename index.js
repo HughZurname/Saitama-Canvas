@@ -20,6 +20,19 @@ const colours = [
     "rgb(252,247,0)"
 ]
 
+let requestId
+let hasBeard = false
+let gotShades = false
+let currentFace = neutral
+
+let beardStrokes = 0
+let eyePokes = 0
+let loops = 0
+
+let beardY = 190
+let tearY = 165
+let shadesY = -100
+
 const dataMap = name => name.map(f => f[0].split(""))
 
 const drawCell = (x, y, width, height, c) => {
@@ -32,7 +45,7 @@ const gridColour = index => colours[index]
 const drawPart = (context, grid, sx, sy) => (
     grid.map(
         (row, i) => row.map(
-            (col, j) => drawCell(j * 2 + sx, i * 2 + sy, 2, 2, gridColour(grid[i][j]))
+            (col, j) => drawCell(j * 2 + sx, i * 2 + sy, 4, 4, gridColour(grid[i][j]))
         )
     )
 )
@@ -40,70 +53,71 @@ const drawPart = (context, grid, sx, sy) => (
 const clearPart = (context, grid, sx, sy) => (
     grid.map(
         (row, i) => row.map(
-            (col, j) => grid[i][j] == 0 ? context.clearRect(j * 2 + sx, i * 2 + sy, 2, 2) : false
+            (col, j) => (grid[i][j] == 0 || 1 || 2) && context.clearRect(j * 2 + sx, i * 2 + sy, 2, 2)
         )
     )
 )
 
-function mouse(evt) {
+const mouse = (evt) => {
     console.log(`x:${evt.clientX} y:${evt.clientY}`)
-    if ((evt.clientX >= 150 && evt.clientX <= 200) && (evt.clientY >= 130 && evt.clientY <= 170)) {
-        currentFace = sad
+    let boundingRect = canvas.getBoundingClientRect();
+    let offsetX = boundingRect.left;
+    let offsetY = boundingRect.top;
+
+    if ((evt.clientX >= 150 + offsetX && evt.clientX <= 200 + offsetX) && (evt.clientY >= 130 + offsetY && evt.clientY <= 170 + offsetY)) {
         cryAnimation()
+        eyePokes < 1 ? eyePokes += 1 : (currentFace = sad) && changeFace()
     }
-    if ((evt.clientX >= 60 && evt.clientX <= 215) && (evt.clientY >= 190 && evt.clientY <= 240)) {
+    if ((evt.clientX >= 60 + offsetX && evt.clientX <= 215 + offsetX) && (evt.clientY >= 190 + offsetY && evt.clientY <= 240 + offsetY)) {
         makeBeard()
-        beardCount < 1 ? beardCount += 1 : beardAnimation()
+        beardStrokes < 1 ? beardStrokes += 1 : beardAnimation()
     }
-    if ((evt.clientX >= 60 && evt.clientX <= 215) && (evt.clientY >= 40 && evt.clientY <= 100)) {
-        shadesAnimation()
+    if ((evt.clientX >= 60 + offsetX && evt.clientX <= 215 + offsetX) && (evt.clientY >= 40 + offsetY && evt.clientY <= 100 + offsetY)) {
+        !gotShades ? shadesAnimation() : false
     }
 }
 
-
-let requestId
-let hasBeard = false
-let gotShades = false
-let currentFace = neutral
-let beardCount = 0
-let beardY = 190,
-    tearY = 165,
-    shadesY = -100
-
 const clearAll = () => context.clearRect(0, 0, WIDTH, HEIGHT)
 
-const tearLoop = () => tearY >= 197 ? tearY = 165 : tearY += 1
+const tearLoop = () => {
+    tearY >= 197 && (tearY = 165)
+    // loops >= 500 && stop() && (loops = 0) && (eyePokes = 0)
+    tearY += 1
+    // loops += 1
+}
 
 const dropShades = () => {
     if (shadesY >= 135) {
-        console.log("BONG")
-        stop()
+        stop(requestId)
         shadesY = -100
+        gotShades = true
     }
-    shadesY += 3
+    shadesY += 5
 }
 
 const growBeard = () => {
     if (beardY >= 240) {
-        stop()
+        stop(requestId)
         beardY = 190
-        beardCount = 0
+        beardStrokes = 0
     }
     beardY += 1
 }
 
 const makeBeard = () => {
-    clearPart(context, dataMap(beard), 45, 168)
     drawPart(context, dataMap(beard), 45, 168)
     hasBeard = true
+}
+
+const placeShades = () => {
+    drawPart(context, dataMap(shades), 69, 135)
 }
 
 const cryAnimation = () => {
     requestId = requestAnimationFrame(cryAnimation)
     drawPart(context, dataMap(currentFace), 58, 80)
-    hasBeard ? makeBeard() : drawPart(context, dataMap(chin), 46, 186)
-    gotShades ? drawPart(context, dataMap(shades), 69, 135) : console.log("SHADES")
-    clearPart(context, dataMap(tear), 162, tearY - 1)
+    hasBeard ? makeBeard() : drawPart(context, dataMap(chin), 44, 184)
+    gotShades && placeShades()
     drawPart(context, dataMap(tear), 162, tearY)
     tearLoop()
 }
@@ -119,49 +133,56 @@ const shadesAnimation = () => {
     drawPart(context, dataMap(background), 0, 0)
     drawPart(context, dataMap(currentFace), 58, 80)
     drawPart(context, dataMap(shades), 69, shadesY)
-    hasBeard ? makeBeard() : drawPart(context, dataMap(chin), 46, 186)
+    hasBeard && makeBeard()
     dropShades()
-    gotShades = true
 }
 
-const stop = () => requestId && cancelAnimationFrame(requestId)
+const stop = (requestId) => cancelAnimationFrame(requestId)
+
+const changeFace = () => {
+    drawPart(context, dataMap(background), 0, 0)
+    drawPart(context, dataMap(currentFace), 58, 80)
+}
 
 kawaiiBtn.addEventListener("click", function () {
-    stop()
+    stop(requestId)
     clearAll()
-    drawPart(context, dataMap(background), 0, 0)
-    drawPart(context, dataMap(kawaii), 58, 80)
-    hasBeard ? makeBeard() : currentFace = kawaii
+    currentFace = kawaii
+    changeFace()
+    gotShades && placeShades()
+    hasBeard && makeBeard()
+    eyePokes = 0
 }, false)
 sadBtn.addEventListener("click", function () {
-    stop()
+    stop(requestId)
     clearAll()
-    drawPart(context, dataMap(background), 0, 0)
-    drawPart(context, dataMap(sad), 58, 80)
-    hasBeard ? makeBeard() : currentFace = sad
+    currentFace = sad
+    changeFace()
+    gotShades && placeShades()
+    hasBeard && makeBeard()
+    eyePokes = 0
 }, false)
 oniBtn.addEventListener("click", function () {
-    stop()
+    stop(requestId)
     clearAll()
-    drawPart(context, dataMap(background), 0, 0)
-    drawPart(context, dataMap(oni), 58, 80)
-    hasBeard ? makeBeard() : currentFace = oni
+    currentFace = oni
+    changeFace()
+    gotShades && placeShades()
+    hasBeard && makeBeard()
+    eyePokes = 0
 }, false)
 resetBtn.addEventListener("click", function () {
-    stop()
+    stop(requestId)
     clearAll()
-    drawPart(context, dataMap(background), 0, 0)
-    drawPart(context, dataMap(neutral), 58, 80)
+    currentFace = neutral
+    changeFace()
 
     hasBeard = false
     gotShades = false
-    beardCount = 0
-    currentFace = neutral
+    beardStrokes = 0
+    eyePokes = 0
 }, false)
 
 canvas.addEventListener("click", mouse)
 
-canvas.addEventListener("click", function () {}, false)
-
-drawPart(context, dataMap(background), 0, 0)
-drawPart(context, dataMap(neutral), 58, 80)
+changeFace()
