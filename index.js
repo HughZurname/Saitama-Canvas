@@ -59,7 +59,6 @@ const clearPart = (context, grid, sx, sy) => (
 )
 
 const mouse = (evt) => {
-    console.log(`x:${evt.clientX} y:${evt.clientY}`)
     let boundingRect = canvas.getBoundingClientRect();
     let offsetX = boundingRect.left;
     let offsetY = boundingRect.top;
